@@ -1,13 +1,10 @@
 package cn.zknu.l_okhttp;
 
-import java.io.IOException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Created by Administrator on 2018\4\10 0010.
@@ -15,9 +12,8 @@ import okhttp3.Response;
 
 public abstract class OkHttpUtil {
 
-    public static void requestGet(ResponseData responseData){
-        final ResponseData resData=responseData;
-        String BASE_URL="http://10.0.2.2/get.php?key=key";
+    public static void requestGet(Callback callback){
+        String BASE_URL="http://10.0.2.2/get.php?key=get";
         OkHttpClient okHttpClient=new OkHttpClient();
         Request request=new Request.Builder()
                 .url(BASE_URL)
@@ -25,24 +21,13 @@ public abstract class OkHttpUtil {
                 .build();
 
         Call call=okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                resData._onResponse(response.body().string());
-            }
-        });
+        call.enqueue(callback);
     }
-    public static void requestPost(ResponseData responseData){
-        final ResponseData resData=responseData;
+    public static void requestPost(Callback callback){
         String BASE_URL="http://10.0.2.2/post.php";
         OkHttpClient okHttpClient=new OkHttpClient();
         FormBody formBody=new FormBody.Builder()
-                .add("key","key")
+                .add("key","Post")
                 .build();
         Request request=new Request.Builder()
                 .url(BASE_URL)
@@ -50,16 +35,6 @@ public abstract class OkHttpUtil {
                 .build();
 
         Call call=okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                resData._onResponse(response.body().string());
-            }
-        });
+        call.enqueue(callback);
     }
 }

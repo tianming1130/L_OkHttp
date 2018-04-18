@@ -1,10 +1,18 @@
 package cn.zknu.l_okhttp;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -12,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mBtnPost;
 
     private TextView mShowMsg;
+    private Handler mHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -24,6 +33,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void init() {
         mBtnGet.setOnClickListener(this);
         mBtnPost.setOnClickListener(this);
+        mHandler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                mShowMsg.setText((String)msg.obj);
+            }
+        };
     }
 
     private void initView() {
@@ -45,31 +61,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void httpPost() {
-        OkHttpUtil.requestPost(new ResponseData() {
+        OkHttpUtil.requestPost(new Callback() {
             @Override
-            public void _onResponse(String responseData) {
-                final String data=responseData;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mShowMsg.setText("Post---->"+data);
-                    }
-                });
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String strRet=response.body().string();
+                Message msg=mHandler.obtainMessage();
+                msg.obj="Post方法获取数据--->"+strRet;
+                mHandler.sendMessage(msg);
             }
         });
     }
 
     private void httpGet() {
-        OkHttpUtil.requestGet(new ResponseData() {
+        OkHttpUtil.requestGet(new Callback() {
             @Override
-            public void _onResponse(String responseData) {
-                final String data=responseData;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mShowMsg.setText("Get---->"+data);
-                    }
-                });
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call,Response response) throws IOException {
+                String strRet=response.body().string();
+                Message msg=mHandler.obtainMessage();
+                msg.obj="get方法获取数据--->"+strRet;
+                mHandler.sendMessage(msg);
             }
         });
     }
